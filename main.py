@@ -1,13 +1,16 @@
 import cv2
 import time
+from emailing import send_email
 
 video = cv2.VideoCapture(0)
 # Time pause per frame in seconds
 time.sleep(1) # Avoid black frames, gives time to load camera
 
 first_frame = None
+status_list = []
 
 while True:
+    status = 0
     check, frame = video.read()
     # Convert frames to gray for less information processing
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -41,7 +44,17 @@ while True:
         # Extract the position, width and height of the ®rectangle
         x, y, w, h = cv2.boundingRect(contour)
         # Display a rectangle over the original frame (by the corners)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+        rectangle = cv2.rectangle(frame, (x, y), (x + w, y + h),
+                                  (0, 255, 0), 3)
+        if rectangle.any:
+            status = 1
+
+    status_list.append(status)
+    status_list = status_list[-2:] # Only the last 2 items
+
+    # When the object exists the fra,e
+    if status_list[0] == 1 and status_list[1] == 0:
+        send_email()
 
     cv2.imshow("Video", frame)
     key = cv2.waitKey(1)
