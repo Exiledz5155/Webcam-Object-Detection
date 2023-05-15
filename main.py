@@ -2,6 +2,8 @@ import cv2
 import time
 from emailing import send_email
 import glob
+import os
+from threading import Thread
 
 video = cv2.VideoCapture(0)
 # Time pause per frame in seconds
@@ -10,6 +12,13 @@ time.sleep(1) # Avoid black frames, gives time to load camera
 first_frame = None
 status_list = []
 count = 1
+
+
+def clean_folder():
+    images = glob.glob("images/*.png")
+    for image in images:
+        os.remove(image)
+
 
 while True:
     status = 0
@@ -61,7 +70,16 @@ while True:
 
     # When the object exists the fra,e
     if status_list[0] == 1 and status_list[1] == 0:
-        send_email()
+        # Creating the thread to run send email function
+        # We must introduce a comma here to show it's a tuple
+        email_thread = Thread(target=send_email, args=(image_with_object, ))
+        email_thread.daemon = True # Execute on the background
+
+        # Creating the thread to run clean folder function
+        clean_thread = Thread(target=clean_folder)
+        clean_thread.daemon = True
+
+        email_thread.start()
 
     cv2.imshow("Video", frame)
     key = cv2.waitKey(1)
@@ -70,3 +88,5 @@ while True:
         break
 
 video.release()
+
+clean_thread.start()
