@@ -15,6 +15,7 @@ if start:
 
         now = datetime.now()
 
+        # Creating the timestamp
         cv2.putText(img=frame, text=now.strftime("%A"), org=(30, 80),
                     fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3,
                     color=(255, 255, 255), thickness=2,
