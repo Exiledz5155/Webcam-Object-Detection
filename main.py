@@ -67,8 +67,9 @@ while True:
 
     status_list.append(status)
     status_list = status_list[-2:] # Only the last 2 items
+    print(status_list)
 
-    # When the object exists the fra,e
+    # When the object exists the frame
     if status_list[0] == 1 and status_list[1] == 0:
         # Creating the thread to run send email function
         # We must introduce a comma here to show it's a tuple
@@ -77,7 +78,7 @@ while True:
 
         # Creating the thread to run clean folder function
         clean_thread = Thread(target=clean_folder)
-        clean_thread.daemon = True
+        email_thread.daemon = True
 
         email_thread.start()
 
